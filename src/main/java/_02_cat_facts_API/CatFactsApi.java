@@ -4,6 +4,8 @@ import _02_cat_facts_API.data_transfer_objects.CatWrapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import _01_intro_to_APIs.data_transfer_objects.Result;
 import reactor.core.publisher.Mono;
 
 /*
@@ -18,7 +20,7 @@ A swagger page for this very simple API can be found here: https://app.swaggerhu
 public class CatFactsApi {
 
     private static final String baseUrl = "https://meowfacts.herokuapp.com/";
-
+String response
     private WebClient webClient;
 
     public CatFactsApi() {
@@ -37,13 +39,21 @@ public class CatFactsApi {
 
 
         //Collect the response from the Mono object
-
+        Mono<String> stringMono = webClient
+        		.get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("q", "Java")
+                        .build())
+                .retrieve()
+                .bodyToMono(String.class);
 
         /*
         Print out the actual JSON response -
         this is what you will input into jsonschema2pojo.com
          */
+        String response = stringMono.block();
 
+        System.out.println(response);
 
         /*
         Use http://www.jsonschema2pojo.org/ to generate your POJO
@@ -62,7 +72,25 @@ public class CatFactsApi {
         //data_transfer_objects package (CatWrapper)
 
         //Use block() to collect the response into a java object using the class you just created
+    	 //collect the response into a java object using the classes you just created
+        Result[] results =  response;
 
+        //take the first Result in the array
+        Result result = results[0];
+
+        //get the first article
+        String bookTitle = result.getTitle();
+
+        //get the title of the article
+        String bookLink = result.getLink();
+
+        //create the message
+        String message =
+                bookTitle + " -\n"
+                        + bookLink;
+
+        //return the message
+        return message;
         //return the Object
         return null;
 
